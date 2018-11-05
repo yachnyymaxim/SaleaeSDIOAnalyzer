@@ -69,6 +69,42 @@ void SDIOAnalyzerResults::GenerateBubbleText( U64 frame_index, Channel& channel,
 	}else if (frame.mType == SDIOAnalyzer::FRAME_CRC){
 		AnalyzerHelpers::GetNumberString( frame.mData1, display_base, 7, number_str1, 128 );
 		AddResultString("CRC ", number_str1);
+	}else if (frame.mType == SDIOAnalyzer::FRAME_CMD52_RWFLAG){
+          if (frame.mData1)
+            {
+              AddResultString("W");
+              //AddResultString("Write");
+              //AddResultString("Register Write");
+            }
+          else
+            {
+              AddResultString("R");
+              //AddResultString("Read");
+              //AddResultString("Register Read");
+            }
+	}else if (frame.mType == SDIOAnalyzer::FRAME_CMD52_FN){
+		AnalyzerHelpers::GetNumberString( frame.mData1, Decimal, 3, number_str1, 128 );
+		AddResultString("F", number_str1);
+		AddResultString("Func: ", number_str1);
+		//AddResultString("Function: ", number_str1);
+	}else if (frame.mType == SDIOAnalyzer::FRAME_CMD52_RAW){
+		AnalyzerHelpers::GetNumberString( frame.mData1, Decimal, 1, number_str1, 128 );
+		AddResultString("RAW: ", number_str1);
+		AddResultString("Read after write: ", number_str1);
+	}else if (frame.mType == SDIOAnalyzer::FRAME_CMD52_STUFF){
+		AnalyzerHelpers::GetNumberString( frame.mData1, display_base, frame.mData2, number_str1, 128 );
+		AddResultString("D/C");
+		AddResultString("Stuff bits: ", number_str1);
+	}else if (frame.mType == SDIOAnalyzer::FRAME_CMD52_ADDR){
+		AnalyzerHelpers::GetNumberString( frame.mData1, display_base, 17, number_str1, 128 );
+		AddResultString("Addr: ", number_str1);
+	}else if (frame.mType == SDIOAnalyzer::FRAME_CMD52_DATA){
+		AnalyzerHelpers::GetNumberString( frame.mData1, display_base, 8, number_str1, 128 );
+		AddResultString("Data: ", number_str1);
+	}else if (frame.mType == SDIOAnalyzer::FRAME_CMD52_FLAGS){
+		AnalyzerHelpers::GetNumberString( frame.mData1, Binary, 8, number_str1, 128 );
+		AddResultString("Response flags: ", number_str1);
+                AddResultString("F: ", number_str1);
 	}
 }
 
