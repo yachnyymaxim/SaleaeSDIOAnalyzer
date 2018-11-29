@@ -105,7 +105,19 @@ void SDIOAnalyzerResults::GenerateBubbleText( U64 frame_index, Channel& channel,
 		AnalyzerHelpers::GetNumberString( frame.mData1, Binary, 8, number_str1, 128 );
 		AddResultString("Response flags: ", number_str1);
                 AddResultString("F: ", number_str1);
-	}
+	}else if (frame.mType == SDIOAnalyzer::FRAME_CMD53_BLOCK){
+          AnalyzerHelpers::GetNumberString( frame.mData1, Decimal, 1, number_str1, 128 );
+          AddResultString("B: ", number_str1);
+          AddResultString("Block: ", number_str1);
+          AddResultString("Block mode: ", number_str1);
+        }else if (frame.mType == SDIOAnalyzer::FRAME_CMD53_OP){
+          AnalyzerHelpers::GetNumberString( frame.mData1, Decimal, 1, number_str1, 128 );
+          AddResultString("Op: ", number_str1);
+	}else if (frame.mType == SDIOAnalyzer::FRAME_CMD53_COUNT){
+          AnalyzerHelpers::GetNumberString( frame.mData1, display_base, 9, number_str1, 128 );
+          AddResultString("C: ", number_str1);
+          AddResultString("Count: ", number_str1);
+        }
 }
 
 void SDIOAnalyzerResults::GenerateExportFile( const char* file, DisplayBase display_base, U32 export_type_user_id )

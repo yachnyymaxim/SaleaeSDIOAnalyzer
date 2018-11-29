@@ -43,7 +43,8 @@ public:
 
         enum frameTypes {FRAME_DIR, FRAME_CMD, FRAME_ARG, FRAME_LONG_ARG, FRAME_CRC,
                          FRAME_CMD52_RWFLAG,FRAME_CMD52_FN,FRAME_CMD52_RAW,FRAME_CMD52_STUFF,
-                         FRAME_CMD52_ADDR,FRAME_CMD52_DATA,FRAME_CMD52_FLAGS};
+                         FRAME_CMD52_ADDR,FRAME_CMD52_DATA,FRAME_CMD52_FLAGS,
+                         FRAME_CMD53_BLOCK, FRAME_CMD53_OP, FRAME_CMD53_COUNT};
 
 protected: //vars
         std::auto_ptr< SDIOAnalyzerSettings > mSettings;
@@ -69,13 +70,16 @@ private:
         U32 packetState;
 
         U32 FrameStateMachine();
-        enum frameStates {TRANSMISSION_BIT, COMMAND, ARGUMENT, CMD52_ARGUMENT, CRC7, STOP};
+        enum frameStates {TRANSMISSION_BIT, COMMAND, ARGUMENT, CMD52_ARGUMENT, CMD53_ARGUMENT, CRC7, STOP};
         U32 frameState;
         U32 frameCounter;
 
         enum cmd52States {CMD52_RWFLAG,CMD52_FN,CMD52_RAW,CMD52_STUFF1,CMD52_ADDR,
                           CMD52_STUFF2,CMD52_DATA,CMD52_RESP_STUFF,CMD52_RESP_FLAGS};
+        enum cmd53States {CMD53_RWFLAG,CMD53_FN,CMD53_BLOCK,CMD53_OP,CMD53_ADDR,
+                          CMD53_COUNT,CMD53_RESP_STUFF,CMD53_RESP_FLAGS,CMD53_RESP_STUFF2};
         U32 cmd52State;
+        U32 cmd53State;
         bool cmd52writenotread;
 
         bool app;

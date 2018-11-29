@@ -210,6 +210,13 @@ U32 SDIOAnalyzer::FrameStateMachine()
 
                             cmd52State = isCmd ? CMD52_RWFLAG : CMD52_RESP_STUFF;
                           }
+                        else if (temp == 53)
+                          {
+                            frameState = CMD53_ARGUMENT;
+                            // Are we decoding a command from host or response from device
+                            // Based on this choose which state to start in
+                            cmd53State = isCmd ? CMD53_RWFLAG : CMD53_RESP_STUFF;
+                          }
                         else
                           {
                             frameState = ARGUMENT;
@@ -413,6 +420,142 @@ U32 SDIOAnalyzer::FrameStateMachine()
                     mResults->AddFrame(frame);
 
                     cmd52State = CMD52_DATA;
+                    startOfNextFrame = frame.mEndingSampleInclusive + 1;
+                    temp = 0;
+                  }
+        }
+        else if (frameState == CMD53_ARGUMENT)
+        {
+                temp = temp << 1 | mCmd->GetBitState();
+
+                frameCounter--;
+                if (cmd53State == CMD53_RWFLAG)
+                  {
+                    Frame frame;
+                    frame.mStartingSampleInclusive = startOfNextFrame;
+                    frame.mEndingSampleInclusive = mClock->GetSampleOfNextEdge() - 1;
+                    frame.mFlags = 0;
+                    frame.mData1 = mCmd->GetBitState();
+                    frame.mType = FRAME_CMD52_RWFLAG;
+                    mResults->AddFrame(frame);
+
+                    cmd53State = CMD53_FN;
+                    startOfNextFrame = frame.mEndingSampleInclusive + 1;
+                    temp = 0;
+                  }
+                else if (cmd53State == CMD53_FN && frameCounter == 28)
+                  {
+                    Frame frame;
+                    frame.mStartingSampleInclusive = startOfNextFrame;
+                    frame.mEndingSampleInclusive = mClock->GetSampleOfNextEdge() - 1;
+                    frame.mFlags = 0;
+                    frame.mData1 = temp;
+                    frame.mType = FRAME_CMD52_FN;
+                    mResults->AddFrame(frame);
+
+                    cmd53State = CMD53_BLOCK;
+                    startOfNextFrame = frame.mEndingSampleInclusive + 1;
+                  }
+                else if (cmd53State == CMD53_BLOCK)
+                  {
+                    Frame frame;
+                    frame.mStartingSampleInclusive = startOfNextFrame;
+                    frame.mEndingSampleInclusive = mClock->GetSampleOfNextEdge() - 1;
+                    frame.mFlags = 0;
+                    frame.mData1 = mCmd->GetBitState();
+                    frame.mType = FRAME_CMD53_BLOCK;
+                    mResults->AddFrame(frame);
+
+                    cmd53State = CMD53_OP;
+                    startOfNextFrame = frame.mEndingSampleInclusive + 1;
+                    temp = 0;
+                  }
+                else if (cmd53State == CMD53_OP)
+                  {
+                    Frame frame;
+                    frame.mStartingSampleInclusive = startOfNextFrame;
+                    frame.mEndingSampleInclusive = mClock->GetSampleOfNextEdge() - 1;
+                    frame.mFlags = 0;
+                    frame.mData1 = mCmd->GetBitState();
+                    frame.mType = FRAME_CMD53_OP;
+                    mResults->AddFrame(frame);
+
+                    cmd53State = CMD53_ADDR;
+                    startOfNextFrame = frame.mEndingSampleInclusive + 1;
+                    temp = 0;
+                  }
+                else if (cmd53State == CMD53_ADDR && frameCounter == 9)
+                  {
+                    Frame frame;
+                    frame.mStartingSampleInclusive = startOfNextFrame;
+                    frame.mEndingSampleInclusive = mClock->GetSampleOfNextEdge() - 1;
+                    frame.mFlags = 0;
+                    frame.mData1 = temp;
+                    frame.mType = FRAME_CMD52_ADDR;
+                    mResults->AddFrame(frame);
+
+                    cmd53State = CMD53_COUNT;
+                    startOfNextFrame = frame.mEndingSampleInclusive + 1;
+                    temp = 0;
+                  }
+                else if (cmd53State == CMD53_COUNT && frameCounter == 0)
+                  {
+                    Frame frame;
+                    frame.mStartingSampleInclusive = startOfNextFrame;
+                    frame.mEndingSampleInclusive = mClock->GetSampleOfNextEdge() - 1;
+                    frame.mFlags = 0;
+                    frame.mData1 = temp;
+                    frame.mType = FRAME_CMD53_COUNT;
+                    mResults->AddFrame(frame);
+
+                    frameState = CRC7;
+                    frameCounter = 7;
+                    startOfNextFrame = frame.mEndingSampleInclusive + 1;
+                    temp = 0;
+                  }
+                else if (cmd53State == CMD53_RESP_STUFF && frameCounter == 16)
+                  {
+                    Frame frame;
+                    frame.mStartingSampleInclusive = startOfNextFrame;
+                    frame.mEndingSampleInclusive = mClock->GetSampleOfNextEdge() - 1;
+                    frame.mFlags = 0;
+                    frame.mData1 = temp;
+                    frame.mData2 = 16;
+                    frame.mType = FRAME_CMD52_STUFF;
+                    mResults->AddFrame(frame);
+
+                    cmd53State = CMD53_RESP_FLAGS;
+                    startOfNextFrame = frame.mEndingSampleInclusive + 1;
+                    temp = 0;
+                  }
+                else if (cmd53State == CMD53_RESP_FLAGS && frameCounter == 8)
+                  {
+                    Frame frame;
+                    frame.mStartingSampleInclusive = startOfNextFrame;
+                    frame.mEndingSampleInclusive = mClock->GetSampleOfNextEdge() - 1;
+                    frame.mFlags = 0;
+                    frame.mData1 = temp;
+                    frame.mData2 = 16;
+                    frame.mType = FRAME_CMD52_FLAGS;
+                    mResults->AddFrame(frame);
+
+                    cmd53State = CMD53_RESP_STUFF2;
+                    startOfNextFrame = frame.mEndingSampleInclusive + 1;
+                    temp = 0;
+                  }
+                else if (cmd53State == CMD53_RESP_STUFF2 && frameCounter == 0)
+                  {
+                    Frame frame;
+                    frame.mStartingSampleInclusive = startOfNextFrame;
+                    frame.mEndingSampleInclusive = mClock->GetSampleOfNextEdge() - 1;
+                    frame.mFlags = 0;
+                    frame.mData1 = temp;
+                    frame.mData2 = 16;
+                    frame.mType = FRAME_CMD52_STUFF;
+                    mResults->AddFrame(frame);
+
+                    frameState = CRC7;
+                    frameCounter = 7;
                     startOfNextFrame = frame.mEndingSampleInclusive + 1;
                     temp = 0;
                   }
