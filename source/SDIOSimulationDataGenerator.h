@@ -30,22 +30,22 @@ class SDIOAnalyzerSettings;
 class SDIOSimulationDataGenerator
 {
 public:
-	SDIOSimulationDataGenerator();
-	~SDIOSimulationDataGenerator();
+    SDIOSimulationDataGenerator();
+    ~SDIOSimulationDataGenerator();
 
-	void Initialize( U32 simulation_sample_rate, SDIOAnalyzerSettings* settings );
-	U32 GenerateSimulationData( U64 newest_sample_requested, U32 sample_rate, SimulationChannelDescriptor** simulation_channel );
-
-protected:
-	SDIOAnalyzerSettings* mSettings;
-	U32 mSimulationSampleRateHz;
+    void Initialize( U32 simulation_sample_rate, SDIOAnalyzerSettings* settings );
+    U32 GenerateSimulationData( U64 newest_sample_requested, U32 sample_rate, SimulationChannelDescriptor** simulation_channel );
 
 protected:
-	void CreateSerialByte();
-	std::string mSerialText;
-	U32 mStringIndex;
+    SDIOAnalyzerSettings* mSettings;
+    U32 mSimulationSampleRateHz;
 
-	SimulationChannelDescriptor mSerialSimulationData;
+protected:
+    void CreateSerialByte();
+    std::string mSerialText;
+    U32 mStringIndex;
+
+    SimulationChannelDescriptor mSerialSimulationData;
 
 };
 #endif //SDIO_SIMULATION_DATA_GENERATOR
