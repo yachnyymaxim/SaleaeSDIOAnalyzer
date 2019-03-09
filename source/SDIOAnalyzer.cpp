@@ -24,9 +24,8 @@
 #include "SDIOAnalyzerSettings.h"
 #include <AnalyzerChannelData.h>
 
-
 SDIOAnalyzer::SDIOAnalyzer()
-:    Analyzer(),
+:    Analyzer2(),
     mSettings( new SDIOAnalyzerSettings() ),
     mSimulationInitilized( false ),
     mAlreadyRun(false),
@@ -41,13 +40,15 @@ SDIOAnalyzer::~SDIOAnalyzer()
     KillThread();
 }
 
+void SDIOAnalyzer::SetupResults()
+{
+	mResults.reset( new SDIOAnalyzerResults( this, mSettings.get() ) );
+	SetAnalyzerResults(mResults.get());
+}
+
 void SDIOAnalyzer::WorkerThread()
 {
-    mResults.reset( new SDIOAnalyzerResults(this, mSettings.get()));
-
     mAlreadyRun = true;
-
-    SetAnalyzerResults( mResults.get());
 
     // mResults->AddChannelBubblesWillAppearOn(mSettings->mClockChannel);
     mResults->AddChannelBubblesWillAppearOn(mSettings->mCmdChannel);
@@ -126,8 +127,8 @@ void SDIOAnalyzer::PacketStateMachine()
             mResults->AddMarker(mClock->GetSampleNumber(),
                 AnalyzerResults::UpArrow, mSettings->mClockChannel);
             if (FrameStateMachine()==1){
-                //mResults->CommitPacketAndStartNewPacket();
-                //mResults->CommitResults();
+                mResults->CommitPacketAndStartNewPacket();
+                mResults->CommitResults();
                 packetState = WAITING_FOR_PACKET;
             }
         }else{

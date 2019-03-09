@@ -28,11 +28,12 @@
 #include "SDIOSimulationDataGenerator.h"
 
 class SDIOAnalyzerSettings;
-class ANALYZER_EXPORT SDIOAnalyzer : public Analyzer
+class ANALYZER_EXPORT SDIOAnalyzer : public Analyzer2
 {
 public:
     SDIOAnalyzer();
     virtual ~SDIOAnalyzer();
+    virtual void SetupResults();
     virtual void WorkerThread();
 
     virtual U32 GenerateSimulationData( U64 newest_sample_requested, U32 sample_rate, SimulationChannelDescriptor** simulation_channels );
@@ -46,6 +47,8 @@ public:
              FRAME_CMD52_ADDR,FRAME_CMD52_DATA,FRAME_CMD52_FLAGS,
              FRAME_CMD53_BLOCK, FRAME_CMD53_OP, FRAME_CMD53_COUNT};
 
+#pragma warning( push )
+#pragma warning( disable : 4251 ) //warning C4251: 'SerialAnalyzer::<...>' : class <...> needs to have dll-interface to be used by clients of class
 protected: //vars
     std::auto_ptr< SDIOAnalyzerSettings > mSettings;
     std::auto_ptr< SDIOAnalyzerResults > mResults;
@@ -59,6 +62,8 @@ protected: //vars
 
     SDIOSimulationDataGenerator mSimulationDataGenerator;
     bool mSimulationInitilized;
+
+#pragma warning( pop )
 
 private:
     bool mAlreadyRun;

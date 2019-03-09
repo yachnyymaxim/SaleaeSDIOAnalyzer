@@ -24,6 +24,7 @@
 #define SDIO_ANALYZER_RESULTS
 
 #include <AnalyzerResults.h>
+#include <ostream>
 
 class SDIOAnalyzer;
 class SDIOAnalyzerSettings;
@@ -40,12 +41,16 @@ public:
     virtual void GenerateFrameTabularText(U64 frame_index, DisplayBase display_base );
     virtual void GeneratePacketTabularText( U64 packet_id, DisplayBase display_base );
     virtual void GenerateTransactionTabularText( U64 transaction_id, DisplayBase display_base );
+private:
+    void GeneratePacketDescription(U64 packet_id, DisplayBase display_base, std::ostream &stream);
 
 protected: //functions
 
 protected:  //vars
     SDIOAnalyzerSettings* mSettings;
     SDIOAnalyzer* mAnalyzer;
+    U64 mLastPacket;
+    U64 mLastFrame;
 };
 
 #endif //SDIO_ANALYZER_RESULTS
